@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Adenda" pageWidth="612" pageHeight="792" columnWidth="442" leftMargin="85" rightMargin="85" topMargin="69" bottomMargin="69" uuid="36ae8c9e-5929-47c9-b4be-309064b17bed">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="132"/>
+	<parameter name="rfc" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select cli."Nombre", cli."AppP", cli."AppM",conves."DescMnpio",
+	MAX(CASE WHEN benef.Nro = 1 THEN '1. '||"NombreBenef" ELSE '' END) AS nom_ben1,
+	MAX(CASE WHEN benef.Nro = 1 THEN "AppPBenef" ELSE '' END) AS app_ben1,
+	MAX(CASE WHEN benef.Nro = 1 THEN "AppMBenef" ELSE '' END) AS apm_ben1,
+	MAX(CASE WHEN benef.Nro = 1 THEN '('||"DescPar"||')' ELSE '' END) AS par1,
+	MAX(CASE WHEN benef.Nro = 2 THEN '2. '||"NombreBenef" ELSE '' END) AS nom_ben2,
+    MAX(CASE WHEN benef.Nro = 2 THEN "AppPBenef" ELSE '' END) AS app_ben2,
+	MAX(CASE WHEN benef.Nro = 2 THEN "AppMBenef" ELSE '' END) AS apm_ben2,
+	MAX(CASE WHEN benef.Nro = 2 THEN '('||"DescPar"||')'  ELSE '' END) AS par2,
+	MAX(CASE WHEN benef.Nro = 3 THEN '3. '||"NombreBenef" ELSE '' END) AS nom_ben3,
+    MAX(CASE WHEN benef.Nro = 3 THEN "AppPBenef" ELSE '' END) AS app_ben3,
+	MAX(CASE WHEN benef.Nro = 3 THEN "AppMBenef" ELSE '' END) AS apm_ben3,
+	MAX(CASE WHEN benef.Nro = 3 THEN '('||"DescPar"||')'  ELSE '' END) AS par3,
+	MAX(CASE WHEN conves.Num2 = 1 THEN "FolioConvenio" END) AS contrato,
+	MAX(CASE WHEN conves.Num2 = 1 AND conves."IdTipoContratacion" = '1' then "fc_con" ELSE '' END) AS fec_contrato,
+	MAX(CASE WHEN conves."IdTipoContratacion" = '2' AND conves."anioconv" = EXTRACT(YEAR FROM now()) THEN "FolioConvenio" ELSE '' END) AS adenda,
+    MAX(CASE WHEN conves."IdTipoContratacion" = '2' AND conves."anioconv" = EXTRACT(YEAR FROM now()) THEN "fc_con" ELSE '' END) AS fec_adenda,
+	MAX(CASE WHEN conves."IdTipoContratacion" = '2' AND conves."anioconv" = EXTRACT(YEAR FROM now()) THEN "DatosPago" ELSE '' END) AS Dat_pag,
+	MAX(CASE WHEN conves."IdTipoContratacion" = '2' AND conves."anioconv" = EXTRACT(YEAR FROM now()) THEN "fec_pag" ELSE '' END) AS fec_pago,
+	MAX(CASE WHEN conves."IdTipoContratacion" = '2' AND conves."anioconv" = EXTRACT(YEAR FROM now()) THEN "DescPaq" ELSE '' END) AS paq_ade,
+	MAX(CASE WHEN conves."IdTipoContratacion" = '2' AND conves."anioconv" = EXTRACT(YEAR FROM now()) THEN '$ '||"tot_ade" ELSE '' END) AS tot_adenda
+from esqfibeso.clientes cli LEFT JOIN
+  (select "NombreBenef", "AppPBenef", "AppMBenef", "RfcTitular", par."DescPar",
+	ROW_NUMBER() OVER (PARTITION BY "RfcTitular" ORDER BY "RfcTitular") AS Num,
+	ROW_NUMBER() OVER (PARTITION BY "RfcTitular", "FolioConvenio"  ORDER BY  "RfcTitular") AS Nro
+	from esqfibeso.beneficiarios ben INNER JOIN esqfibeso.parentescos par
+			 ON par."IdParentesco" = ben."IdParentesco"
+	where
+   	 "RfcTitular" = $P{rfc} and
+     "AnioAsegurado" = cast(EXTRACT(YEAR FROM now()) as text) and
+     ben."Activo" = true
+  ) benef
+  ON cli."Rfc" = benef."RfcTitular"
+  LEFT JOIN
+  (
+	  select cast ("TotalConvenio" as text) as tot_ade,
+ 		"DatosPago",
+		to_char("FchPago", 'DD/MM/YYYY') as fec_pag,
+		to_char("FchContConve", 'DD/MM/YYYY') as fc_con,
+	    EXTRACT(YEAR FROM "FchContConve") as anioconv,
+		con."FolioConvenio",
+		paq."DescPaq",
+		mun."DescMnpio",
+		con."IdTipoContratacion",
+	    con."RfcTitular",
+		ROW_NUMBER() OVER (PARTITION BY "RfcTitular" ORDER BY "FchContConve") AS Num2,
+		ROW_NUMBER() OVER (PARTITION BY "RfcTitular", "FolioConvenio"  ORDER BY  "RfcTitular") AS Nro2
+		from esqfibeso.convenios con INNER JOIN esqfibeso.paquetes_pfs paq
+			 ON con."IdPaqPF" = paq."IdPaqPF"
+			 INNER JOIN esqfibeso.cat_mnpios mun
+			 ON mun."IdRegMnpioS" = con."IdCiudadContra"
+		where "RfcTitular" = $P{rfc} and
+	  		 con."Activo" = true
+	    order by con."FchContConve" asc, con."FchCreReg" asc
+  ) conves
+  ON cli."Rfc" = conves."RfcTitular"
+where cli."Rfc" = $P{rfc}
+GROUP BY cli."Nombre", cli."AppP", cli."AppM",conves."DescMnpio"]]>
+	</queryString>
+	<field name="Nombre" class="java.lang.String"/>
+	<field name="AppP" class="java.lang.String"/>
+	<field name="AppM" class="java.lang.String"/>
+	<field name="DescMnpio" class="java.lang.String"/>
+	<field name="nom_ben1" class="java.lang.String"/>
+	<field name="app_ben1" class="java.lang.String"/>
+	<field name="apm_ben1" class="java.lang.String"/>
+	<field name="par1" class="java.lang.String"/>
+	<field name="nom_ben2" class="java.lang.String"/>
+	<field name="app_ben2" class="java.lang.String"/>
+	<field name="apm_ben2" class="java.lang.String"/>
+	<field name="par2" class="java.lang.String"/>
+	<field name="nom_ben3" class="java.lang.String"/>
+	<field name="app_ben3" class="java.lang.String"/>
+	<field name="apm_ben3" class="java.lang.String"/>
+	<field name="par3" class="java.lang.String"/>
+	<field name="contrato" class="java.lang.String"/>
+	<field name="fec_contrato" class="java.lang.String"/>
+	<field name="adenda" class="java.lang.String"/>
+	<field name="fec_adenda" class="java.lang.String"/>
+	<field name="dat_pag" class="java.lang.String"/>
+	<field name="fec_pago" class="java.lang.String"/>
+	<field name="paq_ade" class="java.lang.String"/>
+	<field name="tot_adenda" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="72">
+			<line>
+				<reportElement mode="Transparent" x="0" y="68" width="442" height="1" uuid="30cd7bf6-7824-4d6d-a1c0-cf90a3a522a5"/>
+				<graphicElement>
+					<pen lineWidth="5.0" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="129" y="37" width="313" height="21" uuid="cdb9bdcd-1e2f-417b-a222-c92e7740ee32"/>
+				<textElement markup="styled">
+					<font fontName="Cambria" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CONVENIO DE AFILIACIÓN PREVISIÓN FUNERARIA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="129" y="16" width="313" height="21" uuid="fda2b0ba-5e0a-4628-af3b-339fe4c1ed1c"/>
+				<textElement markup="styled">
+					<font fontName="Cambria" size="16" isBold="true" pdfEncoding="Cp1252"/>
+				</textElement>
+				<text><![CDATA[Fideicomiso de Beneficios Sociales]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="6" width="129" height="52" uuid="49beb0c1-8d76-41bd-9dbf-c61db5c1d237"/>
+				<imageExpression><![CDATA["\\\\fibeso.png"]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="582" splitType="Stretch">
+			<rectangle>
+				<reportElement x="103" y="298" width="339" height="20" uuid="fd6e859e-4206-4096-ade2-426fc02052a0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="298" width="103" height="20" uuid="3b5503c7-07b0-4668-9e0c-ba9f8c8fadc8"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="20" width="442" height="20" uuid="76cb960f-d665-43ed-be6b-cefda9fae4c4"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ADENDA DE RENOVACIÓN ANUAL]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="103" y="167" width="339" height="20" uuid="2f01746e-62a9-44f6-aad2-9373213df8a4"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="227" width="103" height="71" uuid="30dc1344-2680-46bb-980c-cfc00c679de0"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="187" width="103" height="20" uuid="95f0b3b2-9a38-4261-bfcf-b425fde4774c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="318" width="103" height="29" uuid="a5f373d2-cf38-4202-bfa0-9e024a0780ed"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="103" y="227" width="339" height="71" uuid="0b7f2469-0d8d-45ce-a298-760faca8a62a"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="187" width="103" height="20" uuid="96807941-7be3-4203-a75d-29c5910132cb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cuota ]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="103" y="187" width="339" height="20" uuid="0e57e876-24a6-4ceb-92d0-db7287c1eaab"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="318" width="103" height="29" uuid="bce26322-56e5-4c47-965e-28cb20a76baf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Plan de Prevision Funeraria]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="298" width="103" height="20" uuid="4320e3ed-592b-43a9-a5e2-4adeacab2bc3"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha de pago]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="103" y="318" width="339" height="29" uuid="94c97c0d-829c-41f6-92bc-c9240d2cba82"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="227" width="103" height="71" uuid="733d5896-ed45-4e5f-ac0b-c01c0f15ba4a"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Beneficiarios]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="167" width="103" height="20" uuid="84a80687-9002-458a-a889-502ec21173e0"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="167" width="103" height="20" uuid="a47464b2-1975-4e8f-9d80-4486a2d5e916"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Datos Bancarios]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="103" y="207" width="339" height="20" uuid="21bd8fcc-bb1e-44ce-92f5-fcbcb94cd73f"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="207" width="103" height="20" uuid="21702680-a3ca-4911-8154-a2310a794679"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="207" width="103" height="20" uuid="dec0c2a1-b9e2-43d3-8c25-c25e80d5f884"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Titular ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="347" width="442" height="45" uuid="06462737-8a5f-46ea-98e2-9bc0a8b5c693"/>
+				<textElement textAlignment="Justified">
+					<font fontName="Calibri" size="11" isBold="false"/>
+				</textElement>
+				<text><![CDATA[2.- Una vez establecido, que el pago fue efectuado en tiempo y forma, esta adenda fungirá como el comprobante más amplio para tener los derechos y obligaciones que se describen en el convenio anteriormente citado. ]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="15" y="463" width="200" height="118" uuid="c25ec8b2-5afd-4327-b511-41c25ee7b80f"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="215" y="463" width="200" height="118" uuid="4a431120-26e3-4f29-a60b-a636246c493c"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="15" y="462" width="200" height="118" uuid="82470169-fcc6-4905-a42f-cf29be18dc53"/>
+				<textElement textAlignment="Center" markup="styled">
+					<font fontName="Calibri" size="11" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[
+
+
+
+
+
+___________________________________
+Dra. Cristinne Leo Martel
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="215" y="462" width="200" height="118" uuid="32c2ce9f-8d8b-47c6-ba28-8825a2aa2130"/>
+				<textElement textAlignment="Center" markup="styled">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[
+
+
+
+
+
+___________________________________
+
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="432" width="440" height="31" uuid="5ce6a00a-6d49-48e2-85d5-783a3e34479f"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[En caso de no presentarse el titular deberá contar con una carta poder simple para los efectos específicos de continuidad de afiliación. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="29" y="392" width="413" height="20" uuid="1a07eac5-2a4f-45a0-bb97-e39bffbc98e0"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Solicito y acepto el cambio de mis beneficiarios.  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="29" y="412" width="413" height="20" uuid="1cdeb8b8-7024-4872-b534-a1f5bc6a9102"/>
+				<textElement>
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<text><![CDATA[Acepto renovar mi afiliación con los mismos beneficiarios.        ]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="9" y="392" width="18" height="18" uuid="679d387b-1c54-4a64-8de8-b6c33b5f46ae"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="9" y="412" width="18" height="18" uuid="a9aff0fd-68ca-453c-9ede-856ca652da03"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="442" height="20" uuid="c44bb81c-33b9-42d4-863d-44fa957043aa"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[“ANEXO B” ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="40" width="442" height="73" uuid="2e82fbd7-a6d7-4910-81ae-a21cb2a053a9"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Adenda al Convenio de Afiliación al Plan de Previsión Funeraria No. <style isBold='true' pdfFontName='Calibri'>"+$F{adenda}+"</style>"+" firmada el <style isBold='true' pdfFontName='Calibri'>"+$F{fec_adenda}+"</style>"+" que celebran, por una parte, el Fideicomiso de Beneficios Sociales No. 4600-6 también denominado como FIBESO, a quién en lo sucesivo se le denominará “EL FIDEICOMISO” y por la otra <style isBold='true' pdfFontName='Calibri'>"+$F{Nombre}+" "+$F{AppP}+" "+$F{AppM}+"</style> a quien en lo sucesivo se le denominará “EL AFILIADO”, al tenor de las siguientes cláusulas:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="113" width="442" height="54" uuid="f0e1e812-898f-474e-b433-3cc1a9a457af"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA["1.- De conformidad con el convenio de Afiliación al Plan de Previsión Funeraria No. <style isBold='true' pdfFontName='Calibri'>"+$F{contrato}+"</style> firmado el <style isBold='true' pdfFontName='Calibri'>"+$F{fec_contrato}+"</style>, en la ciudad de <style isBold='true' pdfFontName='Calibri'>"+$F{DescMnpio}+"</style>, se conviene a la continuidad de la afiliación a través de pago anual efectuado con antelación a la firma de la presente adenda."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="167" width="339" height="20" uuid="c91102fa-dad0-4fd9-8633-0d37ea4d2881"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{dat_pag}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="187" width="339" height="20" uuid="f09989a6-8afc-44be-9bb0-5e83f545bb50"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tot_adenda}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="207" width="339" height="20" uuid="2fd74c49-9d7b-423d-a937-e69b9b6935cb"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Nombre}+" "+$F{AppP}+" "+$F{AppM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="227" width="339" height="20" uuid="ef2575fe-ac14-40e9-a162-ba523cbc6ee0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nom_ben1}+" "+$F{app_ben1}+" "+$F{apm_ben1}+" "+$F{par1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="298" width="339" height="20" uuid="4a426a25-c980-41bb-a2ce-02af3e765655"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fec_pago}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="318" width="339" height="29" uuid="4697fbc0-bfa4-4a14-bc4b-05051b3d4662"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{paq_ade}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="267" width="339" height="20" uuid="a2d163bb-3ff4-41a0-83a5-9122d2c3dbd0"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nom_ben3}+" "+$F{app_ben3}+" "+$F{apm_ben3}+" "+$F{par3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="247" width="339" height="20" uuid="1629a4ce-5e14-4296-ab41-2502277b6ad6"/>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nom_ben2}+" "+$F{app_ben2}+" "+$F{apm_ben2}+" "+$F{par2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="215" y="556" width="200" height="20" uuid="a1b656f7-b435-4840-a230-759a6287764e"/>
+				<textElement textAlignment="Center" markup="styled">
+					<font fontName="Calibri" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<style isBold='true' pdfFontName='Calibri'>"+$F{Nombre}+" "+$F{AppP}+" "+$F{AppM}+"</style>"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="67" y="465" width="95" height="88" uuid="5a6eb5f5-7503-4103-b5f8-de94cbe0c985"/>
+				<imageExpression><![CDATA["\\\\firma.png"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>

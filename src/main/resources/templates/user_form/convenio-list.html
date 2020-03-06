@@ -1,0 +1,99 @@
+<div class="table-responsive">
+	<table id="convenioList" class="table table-bordered table-hover table-striped">
+		<thead class="thead-light">
+		<tr>
+			<th scope="col">#</th>
+			<th scope="col">Tipo Contratación</th>
+			<th scope="col">RFC Titular</th>
+			<th scope="col">Folio Convenio</th>
+			<th scope="col">Fecha Contratación</th>
+			<th scope="col">Paquete</th>
+			<th scope="col">Costo Afiliación</th>
+			<th scope="col">Total Convenio</th>
+			<th scope="col">Folio Convenio Previo</th>
+			<th scope="col">Facturado</th>
+			<th scope="col">Periodo renovación</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="convenio: ${convenioList}">
+			<td th:text="${convenio.idReg}"></td>
+			<td th:text="${convenio.catservicios.descTipoContrata}"></td>
+			<td th:text="${convenio.clientes.rfc}"></td>
+			<td th:text="${convenio.folioConvenio}"></td>
+			<td th:text="${convenio.fchContConve}"></td>
+			<td th:text="${convenio.paquetespfs.nombrePaq}"></td>
+			<td th:text="${convenio.costoAfiliacion}"></td>
+			<td th:text="${convenio.totalConvenio}"></td>
+			<td th:text="${convenio.folioConvenioPrev}"></td>
+			<!-- <td th:text="${convenio.uuid} == null ? (${convenio.foliofactura} == null ? (${convenio.serie} == null ? 'No Facturado' : 'Facturado') : 'Facturado') : 'Facturado'"></td> -->
+			<td>
+				<span th:if="${convenio.uuid} == null or ${convenio.foliofactura} == null or ${convenio.serie} == null">
+				<i class="fas fa-thumbs-down" style="color:crimson"></i> No facturado
+				</span>
+				<span th:if="${convenio.uuid} != null and ${convenio.foliofactura} != null and ${convenio.serie} != null">
+				<i class="fas fa-thumbs-up" style="color:green"></i> Facturado
+				</span>
+			</td>
+			<!-- <td th:text="${convenio.esPeriodoRenovacion}"></td>  -->
+			
+			<td>
+				<div th:if="${convenio.permitirRenovacion}">
+					<a class="btn btn-outline-secondary" href="#" th:href="@{'/modificarConvenio/'+ ${convenio.clientes.rfc}}"><i class="fas fa-file-alt"></i> Renovar Convenio</a>
+				</div>
+				<div th:unless="${convenio.permitirRenovacion}">
+					<a class="btn btn-outline-secondary disabled" href="#" th:href="@{'/modificarConvenio/'+ ${convenio.clientes.rfc}}" aria-disabled="true"><i class="fas fa-file-alt"></i> Renovar Convenio</a>
+				</div>
+			</td>
+			<!--<td>-->
+					<!--<a href="#" th:href="@{'/modificarConvenio/'+ ${convenio.idReg}}"><i class="fas fa-edit"></i></a>-->
+					<!-- <a href="#" th:onclick="'javascript:confirmDeleteConv(\''+ ${convenio.idReg} +'\');'"><i class="fas fa-user-times"></i></a>  -->
+					
+					<!-- <a href="#" th:href="@{'/beneficiarioCliente/'+ ${cliente.rfc}}"><i class="fas fa-user-plus"></i></a>  -->
+			<!--</td>-->
+		</tr>
+		</tbody>
+	</table>
+	<div class="alert alert-danger text-center" th:if="${listErrorMessage}" th:text="${listErrorMessage}">Mensaje de Error</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#convenioList').DataTable({
+			"order": [ [0, "desc"] ],
+		"language": {
+		 "emptyTable": "No hay información",
+	        "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+	        "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+	        "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+	        "infoPostFix": "",
+	        "thousands": ",",
+	        "lengthMenu": "Mostrar _MENU_ Entradas",
+	        "loadingRecords": "Cargando...",
+	        "processing": "Procesando...",
+	        "search": "Buscar:",
+	        "zeroRecords": "Sin resultados encontrados",
+	        "paginate": {
+	            "first": "Primero",
+	            "last": "Ultimo",
+	            "next": "Siguiente",
+	            "previous": "Anterior"
+	        }
+		}
+	    } );
+	} );
+</script>
+<script type="text/javascript">
+/*
+function confirmDeleteConv(id){
+	$('#deleteModal').modal('show');
+	$("#clienteIdHiddenInput").val(id);
+}
+
+//function deleteUser(){
+function eliminarCliente(){
+	var id = $("#clienteIdHiddenInput").val();
+    //window.location = "deleteUser/"+id;
+	window.location = "eliminarCliente/"+id;
+}
+*/
+</script>

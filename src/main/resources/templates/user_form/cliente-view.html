@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="ctx" th:content="${#httpServletRequest.getContextPath()}" />
+<title>Clientes</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+	 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+    <!--JQUERY-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <!-- FRAMEWORK BOOTSTRAP para el estilo de la página-->
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+    <!-- Los iconos tipo Solid de Fontawesome-->
+    
+   <script defer src="https://use.fontawesome.com/releases/v5.12.0/js/all.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.12.0/js/v4-shims.js"></script>
+	<script
+	src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script
+	src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#clienteList').DataTable({
+		"language": {
+		 "emptyTable": "No hay información",
+	        "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+	        "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+	        "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+	        "infoPostFix": "",
+	        "thousands": ",",
+	        "lengthMenu": "Mostrar _MENU_ Entradas",
+	        "loadingRecords": "Cargando...",
+	        "processing": "Procesando...",
+	        "search": "Buscar:",
+	        "zeroRecords": "Sin resultados encontrados",
+	        "paginate": {
+	            "first": "Primero",
+	            "last": "Ultimo",
+	            "next": "Siguiente",
+	            "previous": "Anterior"
+	        }
+		}
+	    } );
+	} );
+</script>
+
+</head>
+<header class="page-header">
+	<img src="static/img/header.png" th:src="@{/img/header.png}"
+		width="100%" />
+</header>
+<body>
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+		<div class="container">
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarsExampleDefault"
+				aria-controls="navbarsExampleDefault" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarsExampleDefault">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item dropdown"><a
+						class="nav-link dropdown-toggle" href="#"
+						id="navbarDropdownMenuLink" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false"> <i
+							class="fas fa-church"></i><span> SERVICIOS</span>
+					</a>
+						<div class="dropdown-menu"
+							aria-labelledby="navbarDropdownMenuLink" data-toggle="modal"
+							data-target="#exampleModal">
+							<a class="dropdown-item" href="#"><i class="fas fa-cross"></i>
+								ELEGIR SERVICIO</a>
+						</div></li>
+					<li class="nav-item dropdown"><a
+						class="nav-link dropdown-toggle" href="#"
+						id="navbarDropdownMenuLink" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="false"> <i
+							class="fas fa-user"></i> <span
+							th:text="${#authentication.getPrincipal().getUsername()}"></span>
+					</a>
+						<div class="dropdown-menu"
+							aria-labelledby="navbarDropdownMenuLink">
+							<a class="dropdown-item" href="#" th:href="@{/logout}"><i
+								class="fas fa-sign-out-alt"></i> CERRAR SESIÓN</a>
+						</div></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- <div class="container">
+		<form class="form" role="form" autocomplete="off" th:object="${sesiondto}" th:action="@{/actualizarSession}" method="post">
+			<div class="col-md-4">
+			
+			</div>
+		</form>
+	</div> -->
+	<!-- Button trigger modal -->
+	<!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+  Launch demo modal
+</button>-->
+	<!-- Modal -->
+	<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+		aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Elija un
+						servicio</h5>
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<form class="form" role="form" autocomplete="off"
+					th:object="${sesiondto}" th:action="@{/actualizarSession}"
+					method="post">
+					<div class="modal-body">
+
+						<select class="form-control" th:size="${signup}?1:1"
+							th:field="${sesiondto.servicio}" th:disabled="${disableFields}">
+							<option th:each="servicios :${litadoServicios}"
+								th:value="${servicios.idTipoContratacion}"
+								th:text="${servicios.descTipoContrata}"></option>
+						</select>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-dismiss="modal">Cancelar</button>
+						<input type="submit" class="btn btn-primary" value="Elegir"
+							th:value="${editMode}?'Cambiar':'Elegir'">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<!--<div class="container">
+	<div class="topnav">
+		<div class="">
+	    	<form class="form" role="form" autocomplete="off" th:object="${sesiondto}" th:action="@{/actualizarSession}" method="post">
+	    		<table class="table">
+	    		<tr>
+	    		 <td>
+		      		<label th:text="Servicio" class="col-lg-2 col-form-label bg-primary text-white"></label>
+		      		<div class="col-lg-3">
+						<select class="form-control" th:size="${signup}?1:1" th:field="${sesiondto.servicio}" th:disabled="${disableFields}">
+							<option th:each="servicios :${litadoServicios}" th:value="${servicios.idTipoContratacion}" th:text="${servicios.descTipoContrata}">
+							</option>
+						</select>
+					</div>
+				</td> -->
+	<!-- <td>
+		      		<label th:text="Paquete" class="col-lg-2 col-form-label bg-primary text-white"></label>
+		      		<div class="col-lg-3">
+						<select class="form-control" th:size="${signup}?1:1" th:field="${sesiondto.paquete}" th:disabled="${disableFields}">
+							<option th:each="paks :${listaPaquetes}" th:value="${paks.idPaqPF}" th:text="${paks.nombrePaq}">
+							</option>
+						</select>
+					</div>
+				</td>
+				</tr>
+				<tr>
+				<td colspan="2">
+					<input type="submit" class="btn btn-primary"
+					value="Cambiar" th:value="${editMode}?'Cambiar':'Cambiar'">
+				</td>
+				</tr>
+				</table>
+	    	</form>
+		</div>
+	</div>-->
+	<div class="container">
+		<div class="mx-auto col-sm-12 main-section" id="myTab" role="tablist">
+			<ul class="nav nav-tabs justify-content-end">
+				<li class="nav-item"><a class="nav-link"
+					th:classappend=" ${formTab}" id="form-tab" data-toggle="tab"
+					href="#form" role="tab" aria-controls="form" aria-selected="true">Afiliación</a>
+				</li>
+				<li class="nav-item"><a class="nav-link "
+					th:classappend=" ${listTab}" id="list-tab" data-toggle="tab"
+					href="#list" role="tab" aria-controls="list" aria-selected="false">Lista
+						Afiliados</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:classappend=" ${formbTab}" id="formb-tab" data-toggle="tab"
+					href="#formb" role="tab" aria-controls="form" aria-selected="true"
+					hidden>Beneficiarios</a></li>
+				<li class="nav-item"><a class="nav-link"
+					th:classappend=" ${formcTab}" id="formc-tab" data-toggle="tab"
+					href="#formc" role="tab" aria-controls="form" aria-selected="true">Convenios</a>
+				</li>
+				<li class="nav-item"><a class="nav-link"
+					th:classappend=" ${listConvTab}" id="listConv-tab"
+					data-toggle="tab" href="#listConv" role="tab" aria-controls="form"
+					aria-selected="true">Lista Convenios</a></li>
+				<!--<li class="nav-item">
+			<a class="nav-link" href="#" th:href="@{/logout}"><span th:text="${#authentication.getPrincipal().getUsername()}"></span> - <span>logout  </span><span class="float-right"><i class="fas fa-sign-out-alt"></i></span></a>				   	
+			</li>-->
+			</ul>
+		</div>
+		<div class="col-md-12 d-flex justify-content-sm-center tab-content"
+			id="myTabContent">
+			<div class="col-md-12 tab-pane fade show"
+				th:classappend=" ${listTab}" id="list" role="tabpanel"
+				aria-labelledby="list-tab">
+				<div class="card">
+					<div class="card-header">
+						<h4>Afiliados existentes</h4>
+					</div>
+					<div class="card-body">
+						<div th:include="user_form/cliente-list.html" th:remove="tag"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8 tab-pane fade show" th:classappend=" ${formTab}"
+				id="form" role="tabpanel" aria-labelledby="form-tab">
+				<div class="card">
+					<div class="card-header">
+						<h4>Información del Afiliado</h4>
+					</div>
+					<div class="card-body">
+						<div th:include="user_form/cliente-form.html" th:remove="tag"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8 tab-pane fade show"
+				th:classappend=" ${formbTab}" id="formb" role="tabpanel"
+				aria-labelledby="formb-tab">
+				<div class="card">
+					<div class="card-header">
+						<h4>Información de Beneficiarios</h4>
+					</div>
+					<div class="card-body">
+						<div th:include="user_form/beneficiario-form.html" th:remove="tag"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 tab-pane fade show"
+				th:classappend=" ${listConvTab}" id="listConv" role="tabpanel"
+				aria-labelledby="listConv-tab">
+				<div class="card">
+					<div class="card-header">
+						<h4>Convenios existentes</h4>
+					</div>
+					<div class="card-body">
+						<div th:include="user_form/convenio-list.html" th:remove="tag"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8 tab-pane fade show"
+				th:classappend=" ${formcTab}" id="formc" role="tabpanel"
+				aria-labelledby="formc-tab">
+				<div class="card">
+					<div class="card-header">
+						<h4>Información de Convenios</h4>
+					</div>
+					<div class="card-body">
+						<div th:include="user_form/convenio-form.html" th:remove="tag"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:include="user_form/cliente-eliminar-dialog.html"
+		th:remove="tag"></div>
+	<div th:include="user_form/cliente-no-existe.html" th:remove="tag"></div>
+</body>
+<br>
+<br>
+<footer class="page-footer fixed-bottom">
+	<div class="footer-copyright text-center"
+		style="background-color: rgb(10, 89, 78)">
+		<small>Copyright &copy; 2020, Todos los derechos reservados <a
+			href="https://scempresarial.com.mx">SC Empresarial <img
+				src="static/img/SC1.png" th:src="@{/img/SC1.png}" width="1%" /></a></small>
+	</div>
+</footer>
+</html>

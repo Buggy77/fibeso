@@ -1,0 +1,173 @@
+<form class="form" role="form" autocomplete="off"  th:object="${convenioForm}" th:action="${signup}?@{/signup}:(${editMode} ?@{/registrarConvenio} :@{/registrarConvenio})" method="post">
+	<input class="form-control" type="hidden" th:field="${convenioForm.idReg}"  th:if="${editMode}">
+	
+	<input class="form-control" type="hidden" th:field="${convenioForm.catservicios.idTipoContratacion}" th:disabled="${disableFields}">
+	<input class="form-control" type="hidden" th:field="${convenioForm.usuariosOperador.idOperador}" th:disabled="${disableFields}">
+	<input class="form-control" type="hidden" th:field="${convenioForm.velatorios.idVelatorio}" th:disabled="${disableFields}">
+	<input class="form-control" type="hidden" th:field="${convenioForm.folioConvenio}" th:disabled="${disableFields}">
+	<input class="form-control" type="hidden" th:field="${convenioForm.fchContConve}" th:disabled="${disableFields}">
+	<input class="form-control" type="hidden" th:field="${convenioForm.costoAfiliacion}" th:disabled="${disableFields}">
+	<input class="form-control" type="hidden" th:field="${convenioForm.folioConvenioPrev}" th:disabled="${disableFields}">
+	<input class="form-control" type="hidden" th:field="${convenioForm.activo}" value="1" th:value="1" th:disabled="${disableFields}">
+	<input id="isrenova" name="isrenova" class="form-control" type="hidden" th:value="${editMode}">
+			
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">RFC Titular</label>
+		<div class="col-md-8">
+			<input readonly="readonly" class="form-control" type="text" th:field="${convenioForm.clientes.rfc}" th:disabled="${disableFields}">
+					<div class="alert-danger" th:if="${#fields.hasErrors('clientes.rfc')}" th:errors="*{clientes.rfc}">Error RFC</div>
+	
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label th:text="Paquete" class="col-md-4 col-form-label form-control-label"></label>
+		<div class="col-md-8">
+		<select class="form-control" th:size="${signup}?1:1" th:field="${convenioForm.paquetespfs.idPaqPF}" th:disabled="${disableFields}">  
+		<!--<select class="form-control" th:size="${signup}?1:1" id="paquetespfs.idPaqPF" name="paquetespfs.idPaqPF" th:disabled="${disableFields}"> -->
+				<option th:disabled="disabled" th:selected="selected" value="">-----Seleccionar-----</option>
+				<option th:each="paks :${listaPaquetes}" th:value="${paks.idPaqPF}" th:text="${paks.nombrePaq}">
+				</option>
+			</select>
+			<div class="alert-danger" th:if="${#fields.hasErrors('paquetespfs.idPaqPF')}" th:errors="*{paquetespfs.idPaqPF}">Error Paquete</div>
+			
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">Servicios de Paquete</label>
+		<div class="col-md-8">
+			<input readonly="readonly" class="form-control" type="text" th:field="${convenioForm.serviciosPaq}" th:disabled="${disableFields}">
+			<div class="alert-danger" th:if="${#fields.hasErrors('serviciosPaq')}" th:errors="*{serviciosPaq}">Error Servicios Paquete</div>
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">Precio Paquete</label>
+		<div class="col-md-8">
+			<input readonly="readonly" class="form-control" type="text" th:field="${convenioForm.precioPaq}" th:disabled="${disableFields}">
+			<div class="alert-danger" th:if="${#fields.hasErrors('precioPaq')}" th:errors="*{precioPaq}">Error Precio Paquete</div>
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">Retroactivo</label>
+		<div class="col-md-8">
+			<input readonly="readonly" class="form-control" type="text" th:field="${convenioForm.costoRetroConvenio}" th:disabled="${disableFields}">
+			<div class="alert-danger" th:if="${#fields.hasErrors('costoRetroConvenio')}" th:errors="*{costoRetroConvenio}">Error Retroactivo</div>
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">Subtotal Convenio</label>
+		<div class="col-md-8">
+			<input readonly="readonly" class="form-control" type="text" th:field="${convenioForm.subTotalConvenio}" th:disabled="${disableFields}">
+			<div class="alert-danger" th:if="${#fields.hasErrors('subTotalConvenio')}" th:errors="*{subTotalConvenio}">Error Subtotal</div>
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">Total Convenio</label>
+		<div class="col-md-8">
+			<input readonly="readonly" class="form-control" type="text" th:field="${convenioForm.totalConvenio}" th:disabled="${disableFields}">
+			<div class="alert-danger" th:if="${#fields.hasErrors('totalConvenio')}" th:errors="*{totalConvenio}">Error Total</div>
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">Datos Pago</label>
+		<div class="col-md-8">
+			<input class="form-control" type="text" th:field="${convenioForm.datosPago}" th:disabled="${disableFields}">
+			<div class="alert-danger" th:if="${#fields.hasErrors('datosPago')}" th:errors="*{datosPago}">Error Datos Pago</div>
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label class="col-md-4 col-form-label form-control-label">Fecha de Pago</label>
+		<div class="col-md-8">
+			<input class="form-control" type="date" th:field="${convenioForm.fchPago}" th:disabled="${disableFields}">
+			<div class="alert-danger" th:if="${#fields.hasErrors('fchPago')}" th:errors="*{fchPago}">Error Fecha Pago</div>	
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label th:text="Estado" class="col-md-4 col-form-label form-control-label"></label>
+		<div class="col-md-8" th:contenteditable="${editModeF}">
+			<select class="form-control" th:size="${signup}?1:1" th:field="${convenioForm.estados.idRegEstadoS}" th:disabled="${disableFields}" th:readonly="${readOnly}">
+				<option disabled value="NINGUNO">-----Seleccionar-----</option>
+				<option th:each="estadosconv :${listaEstados}" th:value="${estadosconv.idRegEstadoS}" th:text="${estadosconv.descEstado}">
+				</option>
+			</select>
+			<div class="alert-danger" th:if="${#fields.hasErrors('estados.idRegEstadoS')}" th:errors="*{estados.idRegEstadoS}">Error Estado Convenio</div>
+		</div>
+	</div>
+	
+	<div class="form-group row">
+		<label th:text="Municipio" class="col-md-4 col-form-label form-control-label"></label>
+		<div class="col-md-8" th:contenteditable="${editModeF}">
+			<select class="form-control" th:size="${signup}?1:1" th:field="${convenioForm.municipios.idRegMnpioS}" th:disabled="${disableFields}" th:readonly="${readOnly}">
+				<option disabled value="NINGUNO">-----Seleccionar-----</option>
+				<option th:each="mnpiosconv :${listaMnpios}" th:value="${mnpiosconv.idRegMnpioS}" th:text="${mnpiosconv.descMnpio}">
+				</option>
+			</select>
+			<div class="alert-danger" th:if="${#fields.hasErrors('municipios.idRegMnpioS')}" th:errors="*{municipios.idRegMnpioS}">Error Estado Convenio</div>
+		</div>
+	</div>
+	
+	<div class="form-check" th:contenteditable="${editModeF}">		
+		<input class="form-check-input"
+	      type="checkbox"
+	      th:field="${convenioForm.datosfiscales}" 
+	      th:disabled="${disableFields}"/>
+	      <label class="form-check-label">Facturar</label>
+    </div>
+	
+	<div class="form-group ">
+		<div class="row">
+			<div class="col-md-3">
+			<a class="btn btn-secondary"  th:href="@{'/clienteForm/cancelar'}">Nueva Afiliación</a>
+			</div>
+			<div class="col-md-3">
+			<input type="submit" class="btn btn-primary"
+				value="Guardar Cambios" th:value="${editMode}?'Renovar Convenio':'Crear Convenio'" th:disabled="${disableFields}">
+				</div>
+<!-- 14012020 JPS Inicio -->
+<!--				
+		    <a class="btn btn-primary" th:href="@{'/imprimeConvenios/export'}">Imprimir Convenio</a> -->
+		    
+<!-- 14012020 JPS Fin -->
+				<div class="col-md-2"></div>
+				<div class="col-md-4 text-right" th:disabled="${disableImp}">
+					<div th:if="${editMode}">
+						<!--
+						<button type="button" value="" class="btn btn-success" th:onclick="'window.location.href = \'' +@{/imprimeAdendas/export/{folioconv}(folioconv=${convenioForm.folioConvenio})} + '\'' " th:disabled="${disableImp}"><i class="fas fa-file-pdf"></i> Descarga Adenda</button>
+						-->
+						<button type="button" value="" class="btn btn-success" th:onclick="'window.location.href = \'' +@{/imprimeConvenios/exportadenda/{rfcconv}(rfcconv=${convenioForm.clientes.rfc})} + '\'' " th:disabled="${disableImp}"><i class="fas fa-file-pdf"></i> Descarga Adenda</button>
+					</div>
+					<div th:unless="${editMode}">
+						<button type="button" value="" class="btn btn-success" th:onclick="'window.location.href = \'' +@{/imprimeConvenios/export/{folioconv}(folioconv=${convenioForm.folioConvenio})} + '\'' " th:disabled="${disableImp}"><i class="fas fa-file-pdf"></i> Descarga Convenio</button>
+					</div>
+				</div>
+			
+		</div>
+		
+	</div>
+	
+	
+	
+	<div class="alert alert-danger text-center" th:if="${formErrorMessage}" th:text="${formErrorMessage}">Error MEssage</div>
+	<div class="alert alert-success text-center d-none" id="formSuccess" th:if="${editMode}" >Success MEssage</div>
+	
+	<script type="text/javascript">
+	/*
+	function hola(){
+		console.log('Entra');
+	}
+	*/
+	function impConvenio(rfc){
+		console.log('Entra a evento');
+		console.log('El valor de RFC: ' + rfc);
+	}
+	</script>
+</form>
+

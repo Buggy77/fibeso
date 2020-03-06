@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+    <title>Inicio de Sesión FIBESO-Captación</title>
+	
+	<link rel="shortcut icon"
+	 href="img/favicon.ico" type="image/x-icon"/>
+	<link rel='icon' href='img/favicon.ico' type='image/x-icon'/>
+    <!--JQUERY-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    <!-- FRAMEWORK BOOTSTRAP para el estilo de la página-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+    <!-- Los iconos tipo Solid de Fontawesome-->
+    	 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/v4-shims.css">
+     <script defer src="https://use.fontawesome.com/releases/v5.12.0/js/all.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.12.0/js/v4-shims.js"></script>
+
+    <!-- Nuestro css-->
+     <!--<link rel="stylesheet" type="text/css" href="static/css/index.css" th:href="@{/css/index.css}">-->
+
+</head>
+	<header class="page-header">
+			<img src="static/img/header.png" th:src="@{/img/header.png}" width="100%" />
+	</header>
+<body>
+	<div class=col-md-12></div>
+	<div class="container d-flex justify-content-center">
+		<div class="card">
+			<article class="card-body">
+				<div class="user-img img-thumbnail text-center">
+					<img src="static/img/Fibeso.png" th:src="@{/img/Fibeso.png}" width="50%" />
+				</div>
+				<hr>
+				<div th:if="${param.error}" class="alert alert-danger" role="alert">
+					Usuario y password inválido.</div>
+				<div th:if="${param.logout}" class="alert alert-success"
+					role="alert">Has finalizado sesión.</div>
+				<form th:action="@{/login}" method="post">
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text"> <i class="fa fa-user"></i>
+								</span>
+							</div>
+							<input type="text" class="form-control" placeholder="Nombre de usuario" name="username" />
+						</div>
+						<!-- input-group.// -->
+					</div>
+					<!-- form-group// -->
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text"> <i class="fa fa-lock"></i>
+								</span>
+							</div>
+							<input type="password" class="form-control" placeholder="Contraseña" name="password" />
+						</div>
+						<!-- input-group.// -->
+					</div>
+					<!-- form-group// -->
+					<div class="form-group text-center">
+						<button type="submit" class="btn btn-primary">
+							 Ingresar <i class="fa fa-arrow-circle-right"></i>
+						</button>
+					</div>
+					<!-- form-group// -->
+				</form>
+			</article>
+		</div>
+	</div>
+	<!-- card.// -->
+	<!-- <div class="modal-dialog text-center">
+        <div class="col-sm-8 main-section">
+            <div class="modal-content">
+                <div class="col-12 user-img">
+                    <img src="static/img/user.png" th:src="@{/img/user.png}"/>
+                </div>
+                <form class="col-12" th:action="@{/login}" method="post">
+                    <div class="form-group" id="user-group">
+                        <input type="text" class="form-control" placeholder="Nombre de usuario" name="username"/>
+                    </div>
+                    <div class="form-group" id="contrasena-group">
+                        <input type="password" class="form-control" placeholder="Contraseña" name="password"/>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i>  Ingresar </button>
+                </form>
+                <div class="col-12 forgot invisible" >
+                    <p><a href="#">Recordar contrasena?</a></p>
+                    <p><a href="#" th:href="@{/signup}">Crear Usuario - Registrarse</a>
+                </div>
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+		            Usuario y password inválido.
+		        </div>
+		        <div th:if="${param.logout}" class="alert alert-success" role="alert">
+		            Has finalizado sesión.
+		        </div>
+            </div>
+        </div>
+    </div> -->
+</body>
+<footer class="page-footer fixed-bottom">
+	<div class="footer-copyright text-center"
+		style="background-color: rgb(10, 89, 78)">
+		<small>Copyright &copy; 2020, Todos los derechos reservados <a
+			href="https://scempresarial.com.mx">SC Empresarial <img
+				src="static/img/SC1.png" th:src="@{/img/SC1.png}" width="1%" /></a></small>
+	</div>
+</footer>
+</html>
